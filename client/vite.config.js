@@ -10,8 +10,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
 
       manifest: {
-        name: 'Bijli Bill App',
-        short_name: 'Bijli Bill',
+        name: '69 Electric Bill',
+        short_name: '69 Bill',
 
         start_url: '/',
 
