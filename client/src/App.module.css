@@ -1,0 +1,89 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: var(--ink);
+  color: #fff;
+  padding: 0 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.headerInner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0;
+  gap: 0.5rem;
+}
+
+.logo {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.subtitle {
+  font-size: 0.65rem;
+  color: #888;
+  font-family: var(--mono);
+  letter-spacing: 0.04em;
+  margin-top: 1px;
+}
+
+.nav {
+  display: flex;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.navBtn,
+.navActive {
+  border: none;
+  padding: 0.38rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.navBtn {
+  background: transparent;
+  color: #aaa;
+}
+
+.navBtn:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+
+.navActive {
+  background: var(--accent);
+  color: #fff;
+}
+
+.main {
+  flex: 1;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: var(--ink3);
+  font-family: var(--mono);
+  font-size: 0.9rem;
+}

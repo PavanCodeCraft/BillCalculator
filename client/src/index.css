@@ -1,0 +1,29 @@
+:root {
+  /* App color tokens */
+  --ink:    #1a1a2e;
+  --ink2:   #3d3d5c;
+  --ink3:   #888899;
+  --bg:     #fafaf8;
+  --paper:  #ffffff;
+  --border: #e4e2da;
+  --accent: #e04b1a;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, 'Cascadia Code', Consolas, monospace;
+
+  font: 16px/1.5 var(--sans);
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body { margin: 0; background: var(--bg); }
+
+button { cursor: pointer; font-family: inherit; }
+input  { font-family: inherit; box-sizing: border-box; }
+
+#root { min-height: 100svh; display: flex; flex-direction: column; }
