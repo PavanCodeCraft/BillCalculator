@@ -10,8 +10,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
 
       manifest: {
-        name: '69 Bill',
-        short_name: '69B',
+        name: '69 Electricity Bill',
+        short_name: '69 Bill',
 
         start_url: '/',
 
