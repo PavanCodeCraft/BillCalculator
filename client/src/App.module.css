@@ -87,3 +87,33 @@
   font-family: var(--mono);
   font-size: 0.9rem;
 }
+
+.errorBox {
+  background: #fdecea;
+  border: 1px solid #f1b0a8;
+  border-radius: 8px;
+  padding: 1.25rem;
+  color: #7a1c12;
+  font-size: 0.95rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.errorTitle {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.retryBtn {
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.4rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 0.3rem;
+}

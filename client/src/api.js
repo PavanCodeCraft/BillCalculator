@@ -1,29 +1,26 @@
 const BASE = import.meta.env.VITE_API_URL || "";
 
-export async function fetchLatest() {
-  const r = await fetch(`${BASE}/api/latest`);
-  return r.json();
+// Server se error aaye (500 etc.) to chupchap aage na badho, error throw karo
+async function request(path, options) {
+  const r = await fetch(`${BASE}${path}`, options);
+  let data = null;
+  try { data = await r.json(); } catch { /* empty body */ }
+  if (!r.ok) throw new Error(data?.error || `Server error ${r.status}`);
+  return data;
 }
 
-export async function saveBill(data) {
-  const r = await fetch(`${BASE}/api/bills`, {
+export function fetchLatest() {
+  return request("/api/latest");
+}
+
+export function saveBill(data) {
+  return request("/api/bills", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  return r.json();
 }
 
-export async function fetchAllBills() {
-  const r = await fetch(`${BASE}/api/bills`);
-  return r.json();
-}
-
-export async function updateLatestReadings(updates) {
-  const r = await fetch(`${BASE}/api/latest`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(updates),
-  });
-  return r.json();
+export function fetchAllBills() {
+  return request("/api/bills");
 }

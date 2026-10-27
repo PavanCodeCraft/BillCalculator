@@ -6,7 +6,7 @@ import styles from "./History.module.css";
 function fmt(n) { return Number(n).toFixed(2); }
 
 // Full detailed card — same as BillResult's BillCard
-function BillCard({ room, roomNum, motor, date }) {
+function BillCard({ room, roomNum, motor, date, rate = 10 }) {
   return (
     <div className={styles.card}>
       <div className={styles.cardHeader}>
@@ -72,14 +72,14 @@ function BillCard({ room, roomNum, motor, date }) {
         </div>
         <div className={styles.row}>
           <span>Rate</span>
-          <span className={styles.mono}>₹10 / unit</span>
+          <span className={styles.mono}>₹{rate} / unit</span>
         </div>
       </div>
       <div className={styles.amountBox}>
         <span>Room {roomNum} Total Amount</span>
         <span className={styles.amount}>₹{fmt(room.amount)}</span>
       </div>
-      <div className={styles.cardFooter}>Rate: ₹10/unit • Motor split: 50% owner, 25% each room</div>
+      <div className={styles.cardFooter}>Rate: ₹{rate}/unit • Motor split: 50% owner, 25% each room</div>
     </div>
   );
 }
@@ -142,7 +142,7 @@ export default function History() {
                   return (
                     <div key={rn} className={styles.cardWrap}>
                       <div ref={el => (cardRefs.current[key] = el)}>
-                        <BillCard room={room} roomNum={rn} motor={bill.motor} date={date} />
+                        <BillCard room={room} roomNum={rn} motor={bill.motor} date={date} rate={bill.ratePerUnit} />
                       </div>
                       <button className={styles.dlBtn} onClick={() => downloadBill(bill, rn)}>
                         ↓ Download Room {rn} Bill

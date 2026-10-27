@@ -6,7 +6,7 @@ function fmt(n) {
   return Number(n).toFixed(2);
 }
 
-function BillCard({ room, roomNum, motor, date }) {
+function BillCard({ room, roomNum, motor, date, rate = 10 }) {
   const motorPerRoom = motor.perRoomShare;
 
   return (
@@ -81,7 +81,7 @@ function BillCard({ room, roomNum, motor, date }) {
         </div>
         <div className={styles.row}>
           <span>Rate</span>
-          <span className={styles.mono}>₹10 / unit</span>
+          <span className={styles.mono}>₹{rate} / unit</span>
         </div>
       </div>
 
@@ -92,7 +92,7 @@ function BillCard({ room, roomNum, motor, date }) {
       </div>
 
       <div className={styles.footer}>
-        Rate: ₹10/unit • Motor split: 50% owner, 25% each room
+        Rate: ₹{rate}/unit • Motor split: 50% owner, 25% each room
       </div>
     </div>
   );
@@ -125,7 +125,7 @@ export default function BillResult({ result, onNew }) {
       </div>
 
       <div ref={card1Ref}>
-        <BillCard room={result.room1} roomNum={1} motor={result.motor} date={date} />
+        <BillCard room={result.room1} roomNum={1} motor={result.motor} date={date} rate={result.ratePerUnit} />
       </div>
       <button
         className={styles.dlBtn}
@@ -137,7 +137,7 @@ export default function BillResult({ result, onNew }) {
       <div className={styles.spacer} />
 
       <div ref={card2Ref}>
-        <BillCard room={result.room2} roomNum={2} motor={result.motor} date={date} />
+        <BillCard room={result.room2} roomNum={2} motor={result.motor} date={date} rate={result.ratePerUnit} />
       </div>
       <button
         className={styles.dlBtn}

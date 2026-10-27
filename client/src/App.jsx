@@ -5,14 +5,15 @@ import History from "./components/History.jsx";
 import { fetchLatest } from "./api.js";
 import styles from "./App.module.css";
 
-const DEFAULT_PREV = { room1Prev: 0, room2Prev: 0, motorPrev: 0 };
+const DEFAULT_PREV = { room1Prev: 0, room2Prev: 0, motorPrev: 0, isFirstBill: true };
 
 function parsePrev(data) {
-  if (!data.exists) return DEFAULT_PREV;
+  if (!data?.exists) return DEFAULT_PREV;
   return {
     room1Prev: data.room1Previous,
     room2Prev: data.room2Previous,
     motorPrev: data.motorPrevious,
+    isFirstBill: false,
   };
 }
 
@@ -21,12 +22,15 @@ export default function App() {
   const [prevReadings, setPrevReadings] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
+  // Server se data na aaye to 0 mat dikhao (warna galat bill banega), error dikhao
   const loadPrev = useCallback(() => {
     setLoading(true);
+    setLoadError(false);
     fetchLatest()
       .then(data => setPrevReadings(parsePrev(data)))
-      .catch(() => setPrevReadings(DEFAULT_PREV))
+      .catch(() => { setPrevReadings(null); setLoadError(true); })
       .finally(() => setLoading(false));
   }, []);
 
@@ -69,6 +73,12 @@ export default function App() {
         {tab === "new" ? (
           loading ? (
             <div className={styles.loading}>Loading previous readings…</div>
+          ) : loadError ? (
+            <div className={styles.errorBox}>
+              <div className={styles.errorTitle}>Purani reading load nahi hui</div>
+              <div>Internet check karo aur dobara try karo. Abhi bill mat banao, warna galat banega.</div>
+              <button className={styles.retryBtn} onClick={loadPrev}>Dobara try karo</button>
+            </div>
           ) : result ? (
             <BillResult result={result} onNew={handleNewBill} />
           ) : (

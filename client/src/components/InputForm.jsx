@@ -1,20 +1,20 @@
 import React, { useState } from "react";
 import { calculate } from "../calc.js";
-import { saveBill, updateLatestReadings } from "../api.js";
+import { saveBill } from "../api.js";
 import styles from "./InputForm.module.css";
 
 export default function InputForm({ prevReadings, setPrevReadings, onResult }) {
-  const { room1Prev, room2Prev, motorPrev } = prevReadings;
+  const { room1Prev, room2Prev, motorPrev, isFirstBill } = prevReadings;
 
   const [room1Cur, setRoom1Cur] = useState("");
   const [room2Cur, setRoom2Cur] = useState("");
   const [motorCur, setMotorCur] = useState("");
   const [errors, setErrors]     = useState({});
   const [saving, setSaving]     = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   const [editing, setEditing]   = useState(null);
   const [editVal, setEditVal]   = useState("");
-  const [editSaving, setEditSaving] = useState(false);
 
   const fields = [
     { label: "Room 1", key: "room1", prev: room1Prev, cur: room1Cur, setCur: setRoom1Cur },
@@ -40,6 +40,7 @@ export default function InputForm({ prevReadings, setPrevReadings, onResult }) {
     const e = validate();
     if (Object.keys(e).length) { setErrors(e); return; }
     setErrors({});
+    setSaveError("");
     const data = calculate({
       room1Cur: parseFloat(room1Cur),
       room2Cur: parseFloat(room2Cur),
@@ -47,67 +48,79 @@ export default function InputForm({ prevReadings, setPrevReadings, onResult }) {
       room1Prev, room2Prev, motorPrev,
     });
     setSaving(true);
-    try { await saveBill({ ...data, date: new Date().toISOString() }); } catch {}
-    setSaving(false);
-    onResult(data);
+    try {
+      await saveBill({ ...data, date: new Date().toISOString() });
+      onResult(data);
+    } catch {
+      // Save na ho to agle mahine ki previous reading galat aayegi, isliye rok do
+      setSaveError("Bill save nahi hua. Internet check karke button dobara dabao.");
+    } finally {
+      setSaving(false);
+    }
   }
 
-  async function saveEdit(key) {
+  // Previous reading sirf is bill ke liye badlo. Purana bill database mein waisa hi rahega.
+  function saveEdit(key) {
     const val = parseFloat(editVal);
     if (isNaN(val) || val < 0) return;
-    setEditSaving(true);
-    try {
-      await updateLatestReadings({ [key]: val });
-      setPrevReadings(prev => ({ ...prev, [`${key}Prev`]: val }));
-    } catch {}
-    setEditSaving(false);
+    setPrevReadings(prev => ({ ...prev, [`${key}Prev`]: val }));
+    setErrors(p => ({ ...p, [key]: "" }));
     setEditing(null);
   }
 
   return (
     <div className={styles.wrap}>
       <div className={styles.topNote}>
-        Previous readings auto-loaded from last bill. Sirf current reading daalo.
+        {isFirstBill
+          ? "Pehla bill hai. ✎ dabakar har meter ki previous reading khud daalo."
+          : "Previous readings auto-loaded from last bill. Sirf current reading daalo."}
       </div>
 
-      {fields.map(({ label, key, prev, cur, setCur }) => (
-        <div key={key} className={styles.fieldGroup}>
-          <label className={styles.label}>{label} — Current Meter Reading</label>
-          <div className={styles.prevRow}>
-            {editing === key ? (
-              <>
-                <span className={styles.prevLabel}>Previous:</span>
-                <input
-                  className={styles.editInput}
-                  type="number"
-                  inputMode="numeric"
-                  value={editVal}
-                  onChange={ev => setEditVal(ev.target.value)}
-                  autoFocus
-                />
-                <button className={styles.editSave} onClick={() => saveEdit(key)} disabled={editSaving}>
-                  {editSaving ? "…" : "✓"}
-                </button>
-                <button className={styles.editCancel} onClick={() => setEditing(null)}>✕</button>
-              </>
-            ) : (
-              <>
-                <span className={styles.prevTag}>Previous: <strong>{prev}</strong> units</span>
-                <button className={styles.editBtn} onClick={() => { setEditing(key); setEditVal(String(prev)); }} title="Edit">✎</button>
-              </>
-            )}
+      {fields.map(({ label, key, prev, cur, setCur }) => {
+        const used = parseFloat(cur) - prev;
+        return (
+          <div key={key} className={styles.fieldGroup}>
+            <label className={styles.label}>{label} — Current Meter Reading</label>
+            <div className={styles.prevRow}>
+              {editing === key ? (
+                <>
+                  <span className={styles.prevLabel}>Previous:</span>
+                  <input
+                    className={styles.editInput}
+                    type="number"
+                    inputMode="decimal"
+                    value={editVal}
+                    onChange={ev => setEditVal(ev.target.value)}
+                    autoFocus
+                  />
+                  <button className={styles.editSave} onClick={() => saveEdit(key)}>✓</button>
+                  <button className={styles.editCancel} onClick={() => setEditing(null)}>✕</button>
+                </>
+              ) : (
+                <>
+                  <span className={styles.prevTag}>Previous: <strong>{prev}</strong> units</span>
+                  <button className={styles.editBtn} onClick={() => { setEditing(key); setEditVal(String(prev)); }} title="Edit">✎</button>
+                </>
+              )}
+            </div>
+            <input
+              className={`${styles.input} ${errors[key] ? styles.inputError : ""}`}
+              type="number"
+              inputMode="decimal"
+              placeholder="Current reading..."
+              value={cur}
+              onChange={ev => { setCur(ev.target.value); setErrors(p => ({ ...p, [key]: "" })); }}
+            />
+            {errors[key] ? (
+              <div className={styles.error}>{errors[key]}</div>
+            ) : used >= 0 ? (
+              <div className={styles.usedPreview}>Is baar: {cur} − {prev} = <strong>{+used.toFixed(2)} units</strong></div>
+            ) : null}
           </div>
-          <input
-            className={`${styles.input} ${errors[key] ? styles.inputError : ""}`}
-            type="number"
-            inputMode="numeric"
-            placeholder="Current reading..."
-            value={cur}
-            onChange={ev => { setCur(ev.target.value); setErrors(p => ({ ...p, [key]: "" })); }}
-          />
-          {errors[key] && <div className={styles.error}>{errors[key]}</div>}
-        </div>
-      ))}
+        );
+      })}
+
+      {saveError && <div className={styles.saveError}>{saveError}</div>}
 
       <button className={styles.btn} onClick={handleSubmit} disabled={saving}>
         {saving ? "Saving..." : "Calculate & Save Bill →"}

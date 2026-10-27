@@ -125,3 +125,19 @@
 .btn:hover:not(:disabled) { background: var(--accent); }
 .btn:active:not(:disabled) { transform: scale(0.98); }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.usedPreview {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--ink2);
+  font-family: var(--mono);
+}
+
+.saveError {
+  background: #fdecea;
+  border: 1px solid #f1b0a8;
+  border-radius: 6px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.88rem;
+  color: #7a1c12;
+}
