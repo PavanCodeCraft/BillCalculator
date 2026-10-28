@@ -7,6 +7,8 @@ function fmt(n) { return Number(n).toFixed(2); }
 
 // Full detailed card — same as BillResult's BillCard
 function BillCard({ room, roomNum, motor, date, rate = 10 }) {
+  // Purane bills (50/25/25 split) ko unke purane formula ke saath hi dikhao
+  const isOldSplit = motor.unitsUsed > 0 && Math.abs(motor.ownerShare * 2 - motor.unitsUsed) < 0.001;
   return (
     <div className={styles.card}>
       <div className={styles.cardHeader}>
@@ -43,18 +45,33 @@ function BillCard({ room, roomNum, motor, date, rate = 10 }) {
           <span className={styles.mono}>{motor.currentReading} − {motor.previousReading} = <strong>{fmt(motor.unitsUsed)} units</strong></span>
         </div>
         <div className={styles.dividerSmall} />
-        <div className={styles.row}>
-          <span>Owner's Share <span className={styles.formula}>(total ÷ 2)</span></span>
-          <span className={styles.mono}>{fmt(motor.unitsUsed)} ÷ 2 = {fmt(motor.ownerShare)} units</span>
-        </div>
-        <div className={styles.row}>
-          <span>Tenants' Share <span className={styles.formula}>(total ÷ 2)</span></span>
-          <span className={styles.mono}>{fmt(motor.unitsUsed)} ÷ 2 = {fmt(motor.tenantsShare)} units</span>
-        </div>
-        <div className={`${styles.row} ${styles.rowResult}`}>
-          <span>Room {roomNum}'s Share <span className={styles.formula}>(tenants' ÷ 2)</span></span>
-          <span className={styles.mono}>{fmt(motor.tenantsShare)} ÷ 2 = <strong>{fmt(motor.perRoomShare)} units</strong></span>
-        </div>
+        {isOldSplit ? (
+          <>
+            <div className={styles.row}>
+              <span>Owner's Share <span className={styles.formula}>(total ÷ 2)</span></span>
+              <span className={styles.mono}>{fmt(motor.unitsUsed)} ÷ 2 = {fmt(motor.ownerShare)} units</span>
+            </div>
+            <div className={styles.row}>
+              <span>Tenants' Share <span className={styles.formula}>(total ÷ 2)</span></span>
+              <span className={styles.mono}>{fmt(motor.unitsUsed)} ÷ 2 = {fmt(motor.tenantsShare)} units</span>
+            </div>
+            <div className={`${styles.row} ${styles.rowResult}`}>
+              <span>Room {roomNum}'s Share <span className={styles.formula}>(tenants' ÷ 2)</span></span>
+              <span className={styles.mono}>{fmt(motor.tenantsShare)} ÷ 2 = <strong>{fmt(motor.perRoomShare)} units</strong></span>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className={styles.row}>
+              <span>Owner's Share <span className={styles.formula}>(total ÷ 3)</span></span>
+              <span className={styles.mono}>{fmt(motor.unitsUsed)} ÷ 3 = {fmt(motor.ownerShare)} units</span>
+            </div>
+            <div className={`${styles.row} ${styles.rowResult}`}>
+              <span>Room {roomNum}'s Share <span className={styles.formula}>(total ÷ 3)</span></span>
+              <span className={styles.mono}>{fmt(motor.unitsUsed)} ÷ 3 = <strong>{fmt(motor.perRoomShare)} units</strong></span>
+            </div>
+          </>
+        )}
       </div>
       <div className={styles.section}>
         <div className={styles.sectionTitle}>Final Calculation</div>
@@ -79,7 +96,7 @@ function BillCard({ room, roomNum, motor, date, rate = 10 }) {
         <span>Room {roomNum} Total Amount</span>
         <span className={styles.amount}>₹{fmt(room.amount)}</span>
       </div>
-      <div className={styles.cardFooter}>Rate: ₹{rate}/unit • Motor split: 50% owner, 25% each room</div>
+      <div className={styles.cardFooter}>Rate: ₹{rate}/unit • Motor split: {isOldSplit ? "50% owner, 25% each room" : "1/3 owner, 1/3 each room"}</div>
     </div>
   );
 }
